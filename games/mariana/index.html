@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>As Insígnias do Dragão</title>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.23.0/dist/phaser.js"></script>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+        canvas { border: 1px solid #000; }
+    </style>
+</head>
+<body>
+    <div id="game"></div>
+
+    <script src="scenes/bemVindo.js"></script>
+    <script src="scenes/dragao.js"></script>
+
+    <script>
+        window.onload = () => {
+            const config = {
+                type: Phaser.AUTO,
+                width: 500,
+                height: 500,
+                backgroundColor: '#39addd',
+                scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER },
+                physics: { default: 'arcade', arcade: { gravity: { y: 500 }, debug: false } },
+                parent: "game",
+                dom: { createContainer: true },
+                scene: [Welcome, Dragao, Tutorial]
+            };
+            new Phaser.Game(config);
+            console.log("Jogo iniciado!");
+        };
+    </script>
+</body>
+</html>
