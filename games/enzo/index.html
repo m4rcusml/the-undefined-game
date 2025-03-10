@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
+    <title>Caça Frutas</title>  
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+    </style>    
+</head>
+<body> 
+    <script>
+        // Variáveis globais
+        var frutas, pedras, personagem, cursors, textoPontuacao, pontuacao = 0;
+
+        // Cena de boas-vindas
+        class WelcomeScene extends Phaser.Scene {
+            constructor() {
+                super({ key: 'WelcomeScene' });
+            }
+
+            preload() {
+                // Carregar imagem de fundo
+                this.load.image('fundoJogo', 'assets/fundoJogo.png');
+            }
+
+            create() {
+                // Adicionar imagem de fundo
+                this.add.image(683, 500, 'fundoJogo').setScale(1.9);
+                // Adicionar textos de instrução
+                this.add.text(683, 350, 'Caça Frutas', { fontSize: '70px', fill: '#000' }).setOrigin(0.5);
+                this.add.text(683, 500, 'Pegue as frutas e evite as pedras', { fontSize: '45px', fill: '#000' }).setOrigin(0.5);    
+                this.add.text(683, 650, 'Pressione ENTER para começar', { fontSize: '45px', fill: '#000' }).setOrigin(0.5);
+                this.add.text(683, 750, 'Use as setas esquerda e direita para mover', { fontSize: '45px', fill: '#000' }).setOrigin(0.5);
+
+                // Adicionar evento para pressionar a tecla ENTER
+                this.input.keyboard.on('keydown-ENTER', () => {
+                    console.log('ENTER pressionado');
+                    this.scene.start('GameScene'); // Iniciar a cena do jogo
+                });
+            }
+        }
+
+        // Cena do jogo
+        class GameScene extends Phaser.Scene {
+            constructor() {
+                super({ key: 'GameScene' });
+            }
+
+            preload() {
+                // Carregar imagens dos elementos do jogo
+                this.load.image('fundoJogo', 'assets/fundoJogo.png');
+                this.load.image('laranja', 'assets/laranja.png');
+                this.load.image('abacaxi', 'assets/abacaxi.png');
+                this.load.image('melancia', 'assets/melancia.png');
+                this.load.image('morango', 'assets/morango.png');
+                this.load.image('personagem', 'assets/personagem.png');
+                this.load.image('pedra', 'assets/pedra.png');
+            }
+
+            create() {
+                console.log('GameScene criada');
+                // Adicionar imagem de fundo
+                this.add.image(683, 500, 'fundoJogo').setScale(1.9);
+
+                // Criar grupo de frutas
+                frutas = this.physics.add.group();
+                var frutasConfig = [
+                    { key: 'laranja', scale: 0.15 },
+                    { key: 'abacaxi', scale: 0.15 },
+                    { key: 'melancia', scale: 0.25 },
+                    { key: 'morango', scale: 0.15 }
+                ];
+
+                // Adicionar frutas ao grupo
+                for (var i = 0; i < 8; i++) {
+                    var frutaConfig = Phaser.Math.RND.pick(frutasConfig);
+                    var fruta = frutas.create(Phaser.Math.Between(0, config.width), Phaser.Math.Between(-1000, 0), frutaConfig.key);
+                    fruta.setScale(frutaConfig.scale);
+                    fruta.setVelocityY(Phaser.Math.Between(100, 250));
+                    fruta.setCollideWorldBounds(false);
+                }
+
+                // Criar grupo de pedras
+                pedras = this.physics.add.group();
+                for (var k = 0; k < 5; k++) {
+                    var pedra = pedras.create(Phaser.Math.Between(0, config.width), Phaser.Math.Between(-1000, 0), 'pedra');
+                    pedra.setScale(0.3);
+                    pedra.setVelocityY(Phaser.Math.Between(100, 250));
+                    pedra.setCollideWorldBounds(false);
+                }
+
+                // Criar o personagem
+                personagem = this.physics.add.image(500, 921, 'personagem').setScale(0.9);
+                personagem.setCollideWorldBounds(true);
+
+                // Adicionar colisões com frutas e pedras
+                this.physics.add.overlap(personagem, frutas, coletarFruta, null, this);
+                this.physics.add.overlap(personagem, pedras, baterPedra, null, this);
+
+                // Configurar as teclas de seta
+                cursors = this.input.keyboard.createCursorKeys();
+
+                // Adicionar texto de pontuação
+                textoPontuacao = this.add.text(16, 16, 'Pontuação: 0', { fontSize: '50px', fill: '#000' });
+            }
+
+            update() {
+                // Movimento do personagem
+                personagem.setVelocity(0);
+
+                if (cursors.left.isDown) {
+                    personagem.setVelocityX(-350);
+                } else if (cursors.right.isDown) {
+                    personagem.setVelocityX(350);
+                }
+
+                // Reposicionar frutas e pedras quando tocam o fundo
+                frutas.children.iterate(obj => {
+                    if (obj.y >= config.height - 50) {
+                        resetarObjeto(obj);
+                    }
+                });
+
+                pedras.children.iterate(obj => {
+                    if (obj.y >= config.height - 50) {
+                        resetarObjeto(obj);
+                    }
+                });
+            }
+        }
+
+        // Configuração do jogo
+        var config = {
+            type: Phaser.AUTO,
+            width: 1366,
+            height: 1000,    
+            physics: {
+                default: 'arcade',
+                arcade: {
+                    gravity: { y: 220 },
+                    debug: false
+                }
+            },
+            scene: [WelcomeScene, GameScene]
+        };
+
+        var game = new Phaser.Game(config);
+
+        // Função para resetar a posição dos objetos
+        function resetarObjeto(objeto) {
+            objeto.setPosition(Phaser.Math.Between(0, config.width), -50);
+            objeto.setVelocityY(Phaser.Math.Between(100, 250));
+        }
+
+        // Função para coletar frutas
+        function coletarFruta(personagem, fruta) {
+            resetarObjeto(fruta);
+            pontuacao += 10;
+            textoPontuacao.setText('Pontuação: ' + pontuacao);
+        }
+
+        // Função para bater nas pedras
+        function baterPedra(personagem, pedra) {
+            resetarObjeto(pedra);
+            pontuacao -= 20;
+            textoPontuacao.setText('Pontuação: ' + pontuacao);
+        }
+
+        // Adicionar listener global para a tecla "Enter"
+        window.addEventListener('keydown', function(event) {
+            // Verificar se a tecla pressionada é "Enter"
+            if (event.key === 'Enter') {
+                console.log('ENTER pressionado (listener global)');
+                // Iniciar a cena do jogo
+                game.scene.scenes[0].scene.start('GameScene');
+            }
+        });
+    </script>
+</body>
+</html>

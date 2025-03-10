@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <!-- Define os caracteres de codificação padrão -->
+        <meta charset="UTF-8">
+
+        <!-- Configura a área visível da página web -->
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <!-- Título da página (na aba) -->
+        <title>Jogo autoral Rebeca</title>
+
+        <style>
+            body {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                margin: 0;
+            }
+
+    /* Esse estilo faz com que o jogo fique centralizado e ocupe sempre o maior espaço possível */
+    body {
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #222222;
+      overflow: hidden;
+      width: 100vw;
+    }
+
+    canvas {
+      max-height: 100vh;
+      max-width: 100vw;
+    }
+  
+                
+        </style>
+        
+        <!-- Aponta para um arquivo script externo phaser.js -->
+        <script src="phaser.js"></script>
+        <script src="scenes/EndGame.js"></script>
+        <script src="scenes/GameScene.js"></script>
+        <script src="scenes/StartScene.js"></script>
+
+        <script src="script.js"></script>
+
+    </head>
+
+
+    <body>
+        <!-- Corpo vazio, o jogo será renderizado aqui -->
+    </body>
+
+</html>
